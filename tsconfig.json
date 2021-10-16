@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    /* 基本配置 */
+    "target": "es5",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "allowJs": true,
+    /* 严格配置 */
+    "strict": true,
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+
+    /* 模块配置 */
+    "moduleResolution": "node",
+
+    /* 语法配置 */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "experimentalDecorators": true
+  },
+  "lib": [ "es2015", "dom"],
+  "include": [
+    "src/**/*.ts", 
+    "server/**/*.ts",
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
