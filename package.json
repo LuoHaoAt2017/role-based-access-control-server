@@ -4,7 +4,7 @@
   "description": "基于角色的访问控制",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently \"npm run watch\" \"npm run serve\"",
+    "start": "tsc && concurrently \"npm run watch\" \"npm run serve\"",
     "build": "npm run clean && tsc",
     "watch": "tsc -w",
     "clean": "rimraf ./build",
@@ -24,6 +24,7 @@
     "@types/jest": "^27.0.2",
     "@types/node": "^14.14.25",
     "@types/sequelize": "^4.28.10",
+    "@types/superagent": "^4.1.13",
     "@typescript-eslint/eslint-plugin": "^5.6.0",
     "@typescript-eslint/parser": "^5.6.0",
     "commitizen": "^4.2.4",
@@ -44,9 +45,12 @@
   },
   "dependencies": {
     "casbin": "^5.11.5",
+    "cheerio": "^1.0.0-rc.10",
     "express": "^4.17.1",
+    "moment": "^2.29.1",
     "mysql2": "^2.3.3",
-    "sequelize": "^6.12.0-beta.3"
+    "sequelize": "^6.12.0-beta.3",
+    "superagent": "^6.1.0"
   },
   "author": "LuoHao",
   "license": "ISC",

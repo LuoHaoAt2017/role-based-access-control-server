@@ -1,9 +1,12 @@
 import express from "express";
-function main() {
-  const app = express();
-  app.listen(9090, 'localhost', function() {
-    console.log('server listen on 9090');
-  });
-}
+import router from './router';
 
-main();
+const app = express();
+
+app.use(router);
+
+app.listen(9090, function() {
+  console.log('server listen on 9090');
+});
+
+export default app;
