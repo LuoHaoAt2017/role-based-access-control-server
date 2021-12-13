@@ -46,6 +46,14 @@ var router = (0, express_1.Router)();
 router.get("/", function (req, res) {
     res.status(200).send("hello world");
 });
+router.get("/login.html", function (req, res) {
+    res.status(200).send("\n    <html>\n      <head>\n        <link href=\"https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css\" rel=\"stylesheet\">\n        <script src=\"https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js\"></script>\n        <script src=\"https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js\"></script>\n        <style type=\"text/css\">\n          form {\n            width: 80%;\n            margin: 200px auto;\n            padding: 50px 100px;\n            border: thin solid #eee;\n            border-radius: 4px;\n          }\n          .form-group {\n            display: flex;\n          }\n          .form-group label {\n            width: 150px;\n          }\n        </style>\n      </head>\n      <body>\n        <form action=\"/login\" method=\"post\" enctype=\"application/x-www-form-urlencoded\">\n          <div class=\"form-group\">\n            <label for=\"username\">\u7528\u6237\u540D</label>\n            <input type=\"text\" class=\"form-control\" name=\"username\" id=\"username\">\n          </div>\n          <div class=\"form-group\">\n            <label for=\"password\">\u5BC6\u7801</label>\n            <input type=\"password\" class=\"form-control\" name=\"password\" id=\"password\">\n          </div>\n          <button type=\"submit\" class=\"btn btn-primary\" style=\"width:100%;\">\u63D0\u4EA4</button>\n        </form>\n      </body>\n    </html>\n  ");
+});
+router.post("/login", function (req, res) {
+    var username = req.body.username;
+    var password = req.body.password;
+    res.status(200).send("username: " + username + " password: " + password);
+});
 router.get("/sciences-member", function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
         var url, analyzer, spider, data;

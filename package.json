@@ -44,6 +44,7 @@
     "typescript": "^4.1.3"
   },
   "dependencies": {
+    "body-parser": "^1.19.1",
     "casbin": "^5.11.5",
     "cheerio": "^1.0.0-rc.10",
     "express": "^4.17.1",
