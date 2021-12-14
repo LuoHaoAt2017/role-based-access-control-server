@@ -41,8 +41,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = require("express");
 var analyzer_1 = require("./analyzer");
-var spider_1 = __importDefault(require("./spider"));
 var check_login_1 = __importDefault(require("./middleware/check-login"));
+var spider_1 = __importDefault(require("./spider"));
+var result_1 = __importDefault(require("./helper/result"));
 var router = (0, express_1.Router)();
 router.get("/", function (req, res) {
     if (req.session && req.session.isLogged) {
@@ -89,10 +90,7 @@ router.get("/sciences-member", check_login_1.default, function (req, res) {
                     return [4 /*yield*/, spider.process(url, analyzer)];
                 case 1:
                     data = _a.sent();
-                    res.status(200).send({
-                        successful: true,
-                        data: data
-                    });
+                    res.status(200).send((0, result_1.default)(data));
                     return [2 /*return*/];
             }
         });
@@ -110,10 +108,7 @@ router.get("/engineer-member", check_login_1.default, function (req, res) {
                     return [4 /*yield*/, spider.process(url, analyzer)];
                 case 1:
                     data = _a.sent();
-                    res.status(200).send({
-                        successful: true,
-                        data: data
-                    });
+                    res.status(200).send((0, result_1.default)(data));
                     return [2 /*return*/];
             }
         });

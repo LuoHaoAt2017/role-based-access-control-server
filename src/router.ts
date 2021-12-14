@@ -1,7 +1,8 @@
 import { Router, Request, Response } from "express";
 import { SciencesAnalyzer, EngineerAnalyzer } from "./analyzer";
-import Spider from "./spider";
 import checkLogin from './middleware/check-login';
+import Spider from "./spider";
+import formatResult from './helper/result';
 
 // 重写 Request.ReqBody 的类型
 interface CustomRequest extends Request {
@@ -127,10 +128,7 @@ router.get("/sciences-member", checkLogin, async function (req: Request, res: Re
   // 网络蜘蛛
   const spider = new Spider();
   const data = await spider.process(url, analyzer);
-  res.status(200).send({
-    successful: true,
-    data: data
-  });
+  res.status(200).send(formatResult(data));
 });
 
 router.get("/engineer-member", checkLogin,  async function (req: Request, res: Response) {
@@ -140,10 +138,7 @@ router.get("/engineer-member", checkLogin,  async function (req: Request, res: R
   // 网络蜘蛛
   const spider = new Spider();
   const data = await spider.process(url, analyzer);
-  res.status(200).send({
-    successful: true,
-    data: data
-  });
+  res.status(200).send(formatResult(data));
 });
 
 export default router;
