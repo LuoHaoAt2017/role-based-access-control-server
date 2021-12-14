@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { SciencesAnalyzer, EngineerAnalyzer } from "./analyzer";
 import Spider from "./spider";
+import checkLogin from './middleware/check-login';
 
 // 重写 Request.ReqBody 的类型
 interface CustomRequest extends Request {
@@ -101,10 +102,7 @@ router.get("/logout", function (req: Request, res: Response) {
   res.status(200).redirect('/');
 });
 
-router.get("/home", function (req: Request, res: Response) {
-  if (!req.session || !req.session.isLogged) {
-    return res.redirect("/");
-  }
+router.get("/home", checkLogin, function (req: Request, res: Response) {
   res.send(`
     <html>
       <head>
@@ -122,30 +120,30 @@ router.get("/home", function (req: Request, res: Response) {
   `);
 });
 
-router.get("/sciences-member", async function (req: Request, res: Response) {
-  if (!req.session || !req.session.isLogged) {
-    return res.redirect("/");
-  }
+router.get("/sciences-member", checkLogin, async function (req: Request, res: Response) {
   // 中国科学院全体院士名单
   const url = "http://casad.cas.cn/ysxx2017/ysmdyjj/qtysmd_124280";
   const analyzer = new SciencesAnalyzer();
   // 网络蜘蛛
   const spider = new Spider();
   const data = await spider.process(url, analyzer);
-  res.status(200).send(data);
+  res.status(200).send({
+    successful: true,
+    data: data
+  });
 });
 
-router.get("/engineer-member", async function (req: Request, res: Response) {
-  if (!req.session || !req.session.isLogged) {
-    return res.redirect("/");
-  }
+router.get("/engineer-member", checkLogin,  async function (req: Request, res: Response) {
   // 中国工程院全体院士名单
   const url = "http://www.cae.cn/cae/html/main/col48/column_48_1.html";
   const analyzer = new EngineerAnalyzer();
   // 网络蜘蛛
   const spider = new Spider();
   const data = await spider.process(url, analyzer);
-  res.status(200).send(data);
+  res.status(200).send({
+    successful: true,
+    data: data
+  });
 });
 
 export default router;

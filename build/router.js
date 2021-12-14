@@ -42,6 +42,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = require("express");
 var analyzer_1 = require("./analyzer");
 var spider_1 = __importDefault(require("./spider"));
+var check_login_1 = __importDefault(require("./middleware/check-login"));
 var router = (0, express_1.Router)();
 router.get("/", function (req, res) {
     if (req.session && req.session.isLogged) {
@@ -73,49 +74,46 @@ router.get("/logout", function (req, res) {
     }
     res.status(200).redirect('/');
 });
-router.get("/home", function (req, res) {
-    if (!req.session || !req.session.isLogged) {
-        return res.redirect("/");
-    }
+router.get("/home", check_login_1.default, function (req, res) {
     res.send("\n    <html>\n      <head>\n        <link href=\"https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css\" rel=\"stylesheet\">\n        <script src=\"https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js\"></script>\n        <script src=\"https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js\"></script>\n      </head>\n      <body>\n        Hello Express\n        <a class=\"btn btn-primary\" role=\"button\" style=\"width:100%;\" href=\"/sciences-member\">\u4E2D\u56FD\u79D1\u5B66\u9662\u5168\u4F53\u9662\u58EB\u540D\u5355</a>\n        <a class=\"btn btn-info\" role=\"button\" style=\"width:100%;\" href=\"/engineer-member\">\u4E2D\u56FD\u5DE5\u7A0B\u9662\u5168\u4F53\u9662\u58EB\u540D\u5355</a>\n        <a class=\"btn btn-warning\" role=\"button\" style=\"width:100%;\" href=\"/logout\">\u9000\u51FA</a>\n      </body>\n    </html>\n  ");
 });
-router.get("/sciences-member", function (req, res) {
+router.get("/sciences-member", check_login_1.default, function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
         var url, analyzer, spider, data;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    if (!req.session || !req.session.isLogged) {
-                        return [2 /*return*/, res.redirect("/")];
-                    }
                     url = "http://casad.cas.cn/ysxx2017/ysmdyjj/qtysmd_124280";
                     analyzer = new analyzer_1.SciencesAnalyzer();
                     spider = new spider_1.default();
                     return [4 /*yield*/, spider.process(url, analyzer)];
                 case 1:
                     data = _a.sent();
-                    res.status(200).send(data);
+                    res.status(200).send({
+                        successful: true,
+                        data: data
+                    });
                     return [2 /*return*/];
             }
         });
     });
 });
-router.get("/engineer-member", function (req, res) {
+router.get("/engineer-member", check_login_1.default, function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
         var url, analyzer, spider, data;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    if (!req.session || !req.session.isLogged) {
-                        return [2 /*return*/, res.redirect("/")];
-                    }
                     url = "http://www.cae.cn/cae/html/main/col48/column_48_1.html";
                     analyzer = new analyzer_1.EngineerAnalyzer();
                     spider = new spider_1.default();
                     return [4 /*yield*/, spider.process(url, analyzer)];
                 case 1:
                     data = _a.sent();
-                    res.status(200).send(data);
+                    res.status(200).send({
+                        successful: true,
+                        data: data
+                    });
                     return [2 /*return*/];
             }
         });
