@@ -47,8 +47,8 @@ var check_login_1 = __importDefault(require("./middleware/check-login"));
 var spider_1 = __importDefault(require("./spider"));
 var result_1 = __importDefault(require("./helper/result"));
 var render = (0, vue_server_renderer_1.createRenderer)({
-// 指定模版
-// template: fs.readFileSync('../public/index.html', 'utf8')
+    // 为整个页面的 HTML 提供一个模板。此模板应包含注释 <!--vue-ssr-outlet-->，作为渲染应用程序内容的占位符。
+    template: "\n    <html lang=\"en\">\n      <head>\n        <meta charset=\"UTF-8\">\n        <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n        <link href=\"https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css\" rel=\"stylesheet\"/>\n        <script src=\"https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js\"></script>\n        <script src=\"https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js\"></script>\n        <title>RBAC</title>\n      </head>\n      <body>\n        <!-- \u8FD9\u91CC\u5C06\u662F\u5E94\u7528\u7A0B\u5E8F HTML \u6807\u8BB0\u6CE8\u5165\u7684\u5730\u65B9\u3002 -->\n        <!--vue-ssr-outlet-->\n      </body>\n    </html>\n    ",
 });
 var router = (0, express_1.Router)();
 router.get("/", function (req, res) {
@@ -83,7 +83,7 @@ router.get("/logout", function (req, res) {
 });
 router.get("/home", check_login_1.default, function (req, res) {
     var app = new vue_1.default({
-        template: "\n      <html lang=\"en\">\n        <head>\n          <meta charset=\"UTF-8\">\n          <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n          <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n          <link href=\"https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css\" rel=\"stylesheet\"/>\n          <script src=\"https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js\"></script>\n          <script src=\"https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js\"></script>\n          <title>RBAC</title>\n        </head>\n        <body>\n          <!-- \u8FD9\u91CC\u5C06\u662F\u5E94\u7528\u7A0B\u5E8F HTML \u6807\u8BB0\u6CE8\u5165\u7684\u5730\u65B9\u3002 -->\n          <!--vue-ssr-outlet-->\n          <div>\n            <a class=\"btn btn-primary\" role=\"button\" style=\"width:100%;\" href=\"/sciences-member\">\u4E2D\u56FD\u79D1\u5B66\u9662\u5168\u4F53\u9662\u58EB\u540D\u5355</a>\n            <a class=\"btn btn-info\" role=\"button\" style=\"width:100%;\" href=\"/engineer-member\">\u4E2D\u56FD\u5DE5\u7A0B\u9662\u5168\u4F53\u9662\u58EB\u540D\u5355</a>\n            <a class=\"btn btn-warning\" role=\"button\" style=\"width:100%;\" href=\"/logout\">\u9000\u51FA</a>\n          </div>\n        </body>\n      </html>\n    ",
+        template: "\n      <div>\n        <a class=\"btn btn-primary\" role=\"button\" style=\"width:100%;\" href=\"/sciences-member\">\u4E2D\u56FD\u79D1\u5B66\u9662\u5168\u4F53\u9662\u58EB\u540D\u5355</a>\n        <a class=\"btn btn-info\" role=\"button\" style=\"width:100%;\" href=\"/engineer-member\">\u4E2D\u56FD\u5DE5\u7A0B\u9662\u5168\u4F53\u9662\u58EB\u540D\u5355</a>\n        <a class=\"btn btn-warning\" role=\"button\" style=\"width:100%;\" href=\"/logout\">\u9000\u51FA</a>\n      </div>\n    ",
     });
     render.renderToString(app, function (err, html) {
         if (err) {
@@ -95,7 +95,7 @@ router.get("/home", check_login_1.default, function (req, res) {
 });
 router.get("/sciences-member", check_login_1.default, function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
-        var url, analyzer, spider, data;
+        var url, analyzer, spider, people, app;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -104,8 +104,22 @@ router.get("/sciences-member", check_login_1.default, function (req, res) {
                     spider = new spider_1.default();
                     return [4 /*yield*/, spider.process(url, analyzer)];
                 case 1:
-                    data = _a.sent();
-                    res.status(200).send((0, result_1.default)(data));
+                    people = _a.sent();
+                    app = new vue_1.default({
+                        data: function () {
+                            return {
+                                people: JSON.parse(people)
+                            };
+                        },
+                        template: "\n        <section>\n          <h3>\u4E2D\u56FD\u79D1\u5B66\u9662\u5168\u4F53\u9662\u58EB\u540D\u5355</h3>\n          <ul class=\"list-group\">\n            <li class=\"list-group-item\" v-for=\"(item, index) in people\" :key=\"index\">\n              <a :href=\"item.href\" class=\"list-group-item\">\n                {{ item.name }}\n              </a>\n            </li>\n          </ul>\n        </section>\n      ",
+                    });
+                    render.renderToString(app, function (err, html) {
+                        if (err) {
+                            res.status(500).end("Internal Server Error");
+                            return;
+                        }
+                        res.end(html);
+                    });
                     return [2 /*return*/];
             }
         });
