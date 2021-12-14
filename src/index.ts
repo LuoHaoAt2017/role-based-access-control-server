@@ -1,7 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import cookieSession from 'cookie-session';
-import router from './router';
+import router from './routes/router';
 import reqRecord from './middleware/req-record';
 
 const app = express();
@@ -16,7 +16,7 @@ app.use(cookieSession({
   name: 'session',
   keys: ['rbac'],
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}));
+})); // https://www.youtube.com/watch?v=lNQAl71Abqc
 // 注册路由
 app.use(router);
 // 指定端口

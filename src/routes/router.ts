@@ -1,10 +1,10 @@
 import Vue from "vue";
 import { createRenderer } from "vue-server-renderer";
 import { Router, Request, Response } from "express";
-import { SciencesAnalyzer, EngineerAnalyzer } from "./analyzer";
-import checkLogin from "./middleware/check-login";
-import Spider from "./spider";
-import formatResult from "./helper/result";
+import { SciencesAnalyzer, EngineerAnalyzer } from "../utils/analyzer";
+import checkLogin from "../middleware/check-login";
+import Spider from "../utils/spider";
+import formatResult from "../utils/result";
 const render = createRenderer({
   // 为整个页面的 HTML 提供一个模板。此模板应包含注释 <!--vue-ssr-outlet-->，作为渲染应用程序内容的占位符。
   template: `

@@ -42,10 +42,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var vue_1 = __importDefault(require("vue"));
 var vue_server_renderer_1 = require("vue-server-renderer");
 var express_1 = require("express");
-var analyzer_1 = require("./utils/analyzer");
-var check_login_1 = __importDefault(require("./middleware/check-login"));
-var spider_1 = __importDefault(require("./utils/spider"));
-var result_1 = __importDefault(require("./utils/result"));
+var analyzer_1 = require("../utils/analyzer");
+var check_login_1 = __importDefault(require("../middleware/check-login"));
+var spider_1 = __importDefault(require("../utils/spider"));
+var result_1 = __importDefault(require("../utils/result"));
 var render = (0, vue_server_renderer_1.createRenderer)({
     // 为整个页面的 HTML 提供一个模板。此模板应包含注释 <!--vue-ssr-outlet-->，作为渲染应用程序内容的占位符。
     template: "\n    <html lang=\"en\">\n      <head>\n        <meta charset=\"UTF-8\">\n        <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n        <link href=\"https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css\" rel=\"stylesheet\"/>\n        <script src=\"https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js\"></script>\n        <script src=\"https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js\"></script>\n        <title>RBAC</title>\n      </head>\n      <body>\n        <!-- \u8FD9\u91CC\u5C06\u662F\u5E94\u7528\u7A0B\u5E8F HTML \u6807\u8BB0\u6CE8\u5165\u7684\u5730\u65B9\u3002 -->\n        <!--vue-ssr-outlet-->\n      </body>\n    </html>\n    ",

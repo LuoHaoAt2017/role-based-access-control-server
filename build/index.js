@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
 var body_parser_1 = __importDefault(require("body-parser"));
 var cookie_session_1 = __importDefault(require("cookie-session"));
-var router_1 = __importDefault(require("./router"));
+var router_1 = __importDefault(require("./routes/router"));
 var req_record_1 = __importDefault(require("./middleware/req-record"));
 var app = (0, express_1.default)();
 // 虚拟路径前缀
@@ -20,7 +20,7 @@ app.use((0, cookie_session_1.default)({
     name: 'session',
     keys: ['rbac'],
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}));
+})); // https://www.youtube.com/watch?v=lNQAl71Abqc
 // 注册路由
 app.use(router_1.default);
 // 指定端口
