@@ -5,7 +5,8 @@ import router from './router';
 import reqRecord from './middleware/req-record';
 
 const app = express();
-
+// 虚拟路径前缀
+app.use('/static', express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(reqRecord);
 app.use(cookieSession({

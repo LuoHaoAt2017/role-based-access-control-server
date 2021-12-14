@@ -39,11 +39,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var vue_1 = __importDefault(require("vue"));
+var vue_server_renderer_1 = require("vue-server-renderer");
 var express_1 = require("express");
 var analyzer_1 = require("./analyzer");
 var check_login_1 = __importDefault(require("./middleware/check-login"));
 var spider_1 = __importDefault(require("./spider"));
 var result_1 = __importDefault(require("./helper/result"));
+var render = (0, vue_server_renderer_1.createRenderer)({
+// 指定模版
+// template: fs.readFileSync('../public/index.html', 'utf8')
+});
 var router = (0, express_1.Router)();
 router.get("/", function (req, res) {
     if (req.session && req.session.isLogged) {
@@ -73,10 +79,19 @@ router.get("/logout", function (req, res) {
     if (req.session) {
         req.session.isLogged = false;
     }
-    res.status(200).redirect('/');
+    res.status(200).redirect("/");
 });
 router.get("/home", check_login_1.default, function (req, res) {
-    res.send("\n    <html>\n      <head>\n        <link href=\"https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css\" rel=\"stylesheet\">\n        <script src=\"https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js\"></script>\n        <script src=\"https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js\"></script>\n      </head>\n      <body>\n        Hello Express\n        <a class=\"btn btn-primary\" role=\"button\" style=\"width:100%;\" href=\"/sciences-member\">\u4E2D\u56FD\u79D1\u5B66\u9662\u5168\u4F53\u9662\u58EB\u540D\u5355</a>\n        <a class=\"btn btn-info\" role=\"button\" style=\"width:100%;\" href=\"/engineer-member\">\u4E2D\u56FD\u5DE5\u7A0B\u9662\u5168\u4F53\u9662\u58EB\u540D\u5355</a>\n        <a class=\"btn btn-warning\" role=\"button\" style=\"width:100%;\" href=\"/logout\">\u9000\u51FA</a>\n      </body>\n    </html>\n  ");
+    var app = new vue_1.default({
+        template: "\n      <html lang=\"en\">\n        <head>\n          <meta charset=\"UTF-8\">\n          <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n          <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n          <link href=\"https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css\" rel=\"stylesheet\"/>\n          <script src=\"https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js\"></script>\n          <script src=\"https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js\"></script>\n          <title>RBAC</title>\n        </head>\n        <body>\n          <!-- \u8FD9\u91CC\u5C06\u662F\u5E94\u7528\u7A0B\u5E8F HTML \u6807\u8BB0\u6CE8\u5165\u7684\u5730\u65B9\u3002 -->\n          <!--vue-ssr-outlet-->\n          <div>\n            <a class=\"btn btn-primary\" role=\"button\" style=\"width:100%;\" href=\"/sciences-member\">\u4E2D\u56FD\u79D1\u5B66\u9662\u5168\u4F53\u9662\u58EB\u540D\u5355</a>\n            <a class=\"btn btn-info\" role=\"button\" style=\"width:100%;\" href=\"/engineer-member\">\u4E2D\u56FD\u5DE5\u7A0B\u9662\u5168\u4F53\u9662\u58EB\u540D\u5355</a>\n            <a class=\"btn btn-warning\" role=\"button\" style=\"width:100%;\" href=\"/logout\">\u9000\u51FA</a>\n          </div>\n        </body>\n      </html>\n    ",
+    });
+    render.renderToString(app, function (err, html) {
+        if (err) {
+            res.status(500).end("Internal Server Error");
+            return;
+        }
+        res.end(html);
+    });
 });
 router.get("/sciences-member", check_login_1.default, function (req, res) {
     return __awaiter(this, void 0, void 0, function () {

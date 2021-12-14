@@ -9,6 +9,8 @@ var cookie_session_1 = __importDefault(require("cookie-session"));
 var router_1 = __importDefault(require("./router"));
 var req_record_1 = __importDefault(require("./middleware/req-record"));
 var app = (0, express_1.default)();
+// 虚拟路径前缀
+app.use('/static', express_1.default.static('public'));
 app.use(body_parser_1.default.urlencoded({ extended: false }));
 app.use(req_record_1.default);
 app.use((0, cookie_session_1.default)({
