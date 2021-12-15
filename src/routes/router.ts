@@ -2,7 +2,7 @@ import Vue from "vue";
 import { createRenderer } from "vue-server-renderer";
 import { Router, Request, Response } from "express";
 import { SciencesAnalyzer, EngineerAnalyzer } from "../utils/analyzer";
-import checkLogin from "../middleware/check-login";
+import { checkSessionLogin } from "../middleware/login";
 import Spider from "../utils/spider";
 import formatResult from "../utils/result";
 const render = createRenderer({
@@ -35,12 +35,93 @@ interface CustomRequest extends Request {
 
 const router = Router();
 
-router.get("/", function (req: Request, res: Response) {
-  if (req.session && req.session.isLogged) {
-    return res.redirect("/home");
+router.post("/login", function (req: CustomRequest, res: Response) {
+  // 请求体中预期含有 username 和 password。
+  const username = req.body.username;
+  const password = req.body.password;
+  // console.log('username: ', username, ' password: ', password);
+  if (username === "luohao" && password === "123") {
+    req.session && (req.session.isLogged = true);
+    res.status(200).send(formatResult("登录成功"));
+  } else {
+    res.status(500).send(formatResult(null, "登录失败"));
   }
-  // 期望在 req 上添加属性 playcard
-  req.playcard = "welcome to world";
+});
+
+router.get("/logout", function (req: Request, res: Response) {
+  if (req.session) {
+    req.session.isLogged = false;
+  }
+  res.status(200).send(formatResult("退出成功"));
+});
+
+router.get(
+  "/sciences-member",
+  checkSessionLogin,
+  async function (req: Request, res: Response) {
+    // 中国科学院全体院士名单
+    const url = "http://casad.cas.cn/ysxx2017/ysmdyjj/qtysmd_124280";
+    const analyzer = new SciencesAnalyzer();
+    // 网络蜘蛛
+    const spider = new Spider();
+    const data = await spider.process(url, analyzer);
+    res.status(200).send(formatResult(data));
+  }
+);
+
+router.get(
+  "/engineer-member",
+  checkSessionLogin,
+  async function (req: Request, res: Response) {
+    // 中国工程院全体院士名单
+    const url = "http://www.cae.cn/cae/html/main/col48/column_48_1.html";
+    const analyzer = new EngineerAnalyzer();
+    // 网络蜘蛛
+    const spider = new Spider();
+    const data = await spider.process(url, analyzer);
+    res.status(200).send(formatResult(data));
+  }
+);
+
+router.get(
+  "/sciences-member.html",
+  async function (req: Request, res: Response) {
+    // 中国科学院全体院士名单
+    const url = "http://casad.cas.cn/ysxx2017/ysmdyjj/qtysmd_124280";
+    const analyzer = new SciencesAnalyzer();
+    // 网络蜘蛛
+    const spider = new Spider();
+    const people = await spider.process(url, analyzer);
+    const app = new Vue({
+      data() {
+        return {
+          people: JSON.parse(people),
+        };
+      },
+      template: `
+        <section>
+          <h3>中国科学院全体院士名单</h3>
+          <ul class="list-group">
+            <li class="list-group-item" v-for="(item, index) in people" :key="index">
+              <a :href="item.href" class="list-group-item">
+                {{ item.name }}
+              </a>
+            </li>
+          </ul>
+        </section>
+      `,
+    });
+    render.renderToString(app, function (err, html) {
+      if (err) {
+        res.status(500).end("Internal Server Error");
+        return;
+      }
+      res.end(html);
+    });
+  }
+);
+
+router.get("/login", function (req: Request, res: Response) {
   res.status(200).send(`
     <html>
       <head>
@@ -80,51 +161,7 @@ router.get("/", function (req: Request, res: Response) {
   `);
 });
 
-router.post("/login", function (req: CustomRequest, res: Response) {
-  // 请求体中预期含有 username 和 password。
-  const username = req.body.username;
-  const password = req.body.password;
-  // global.env = 'luohao';
-  if (req.session && req.session.isLogged) {
-    return res.redirect("/home");
-  } else if (username === "luohao" && password === "123") {
-    req.session && (req.session.isLogged = true);
-    res.status(200).send(`
-      <html>
-        <head>
-          <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" rel="stylesheet">
-          <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
-          <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
-        </head>
-        <body>
-          <a class="btn btn-success" role="button" style="width:100%;" href="/home">登录成功 前往首页</a>
-        </body>
-      </html>
-    `);
-  } else {
-    res.status(200).send(`
-      <html>
-        <head>
-          <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" rel="stylesheet">
-          <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
-          <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
-        </head>
-        <body>
-          <a class="btn btn-danger" role="button" style="width:100%;" href="/">登录失败 前往登录页面</a>
-        </body>
-      </html>
-    `);
-  }
-});
-
-router.get("/logout", function (req: Request, res: Response) {
-  if (req.session) {
-    req.session.isLogged = false;
-  }
-  res.status(200).redirect("/");
-});
-
-router.get("/home", checkLogin, function (req: Request, res: Response) {
+router.get("/home", function (req: Request, res: Response) {
   const app = new Vue({
     template: `
       <div>
@@ -143,58 +180,5 @@ router.get("/home", checkLogin, function (req: Request, res: Response) {
     res.end(html);
   });
 });
-
-router.get(
-  "/sciences-member",
-  checkLogin,
-  async function (req: Request, res: Response) {
-    // 中国科学院全体院士名单
-    const url = "http://casad.cas.cn/ysxx2017/ysmdyjj/qtysmd_124280";
-    const analyzer = new SciencesAnalyzer();
-    // 网络蜘蛛
-    const spider = new Spider();
-    const people = await spider.process(url, analyzer);
-    const app = new Vue({
-      data() {
-        return {
-          people: JSON.parse(people)
-        }
-      },
-      template: `
-        <section>
-          <h3>中国科学院全体院士名单</h3>
-          <ul class="list-group">
-            <li class="list-group-item" v-for="(item, index) in people" :key="index">
-              <a :href="item.href" class="list-group-item">
-                {{ item.name }}
-              </a>
-            </li>
-          </ul>
-        </section>
-      `,
-    });
-    render.renderToString(app, function (err, html) {
-      if (err) {
-        res.status(500).end("Internal Server Error");
-        return;
-      }
-      res.end(html);
-    });
-  }
-);
-
-router.get(
-  "/engineer-member",
-  checkLogin,
-  async function (req: Request, res: Response) {
-    // 中国工程院全体院士名单
-    const url = "http://www.cae.cn/cae/html/main/col48/column_48_1.html";
-    const analyzer = new EngineerAnalyzer();
-    // 网络蜘蛛
-    const spider = new Spider();
-    const data = await spider.process(url, analyzer);
-    res.status(200).send(formatResult(data));
-  }
-);
 
 export default router;

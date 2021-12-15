@@ -1,22 +1,39 @@
 import express from "express";
 import bodyParser from "body-parser";
 import cookieSession from 'cookie-session';
+import cors from 'cors';
 import router from './routes/router';
-import reqRecord from './middleware/req-record';
-
+import record from './middleware/record';
 const app = express();
 // 虚拟路径前缀
 app.use('/static', express.static('./src/assets'));
 // 解析 form 参数
 app.use(bodyParser.urlencoded({ extended: false }));
+// 解析 json 参数
+app.use(bodyParser.json());
 // 自定义中间件 统计请求。
-app.use(reqRecord);
+// app.use(record);
 // 中间件
 app.use(cookieSession({
   name: 'session',
   keys: ['rbac'],
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
-})); // https://www.youtube.com/watch?v=lNQAl71Abqc
+}));
+// 解决跨域问题
+// app.use(cors({
+//   origin: '*',
+//   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+// }));
+//设置跨域访问
+app.all('*', function(req, res, next) {
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  res.header("Access-Control-Allow-Origin", "http://localhost:8088");
+  res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Content-Type", "application/json;charset=utf-8");
+  next();
+});
+
 // 注册路由
 app.use(router);
 // 指定端口
