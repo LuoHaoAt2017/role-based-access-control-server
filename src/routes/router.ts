@@ -2,7 +2,7 @@ import Vue from "vue";
 import { createRenderer } from "vue-server-renderer";
 import { Router, Request, Response } from "express";
 import { SciencesAnalyzer, EngineerAnalyzer } from "../utils/analyzer";
-import { checkSessionLogin } from "../middleware/login";
+import { checkLogin } from "../middleware/login";
 import Spider from "../utils/spider";
 import formatResult from "../utils/result";
 const render = createRenderer({
@@ -57,7 +57,7 @@ router.get("/logout", function (req: Request, res: Response) {
 
 router.get(
   "/sciences-member",
-  checkSessionLogin,
+  checkLogin,
   async function (req: Request, res: Response) {
     // 中国科学院全体院士名单
     const url = "http://casad.cas.cn/ysxx2017/ysmdyjj/qtysmd_124280";
@@ -71,7 +71,7 @@ router.get(
 
 router.get(
   "/engineer-member",
-  checkSessionLogin,
+  checkLogin,
   async function (req: Request, res: Response) {
     // 中国工程院全体院士名单
     const url = "http://www.cae.cn/cae/html/main/col48/column_48_1.html";
