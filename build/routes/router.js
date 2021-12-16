@@ -61,7 +61,7 @@ router.post("/login", function (req, res) {
         res.status(200).send((0, result_1.default)("登录成功"));
     }
     else {
-        res.status(500).send((0, result_1.default)(null, "登录失败"));
+        res.status(500).send((0, result_1.default)(null, "用户名或者密码错误"));
     }
 });
 router.get("/logout", function (req, res) {

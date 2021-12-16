@@ -29,7 +29,7 @@ app.use((0, cookie_session_1.default)({
 // }));
 //设置跨域访问
 app.all('*', function (req, res, next) {
-    res.header("Access-Control-Allow-Headers", "Content-Type");
+    res.header("Access-Control-Allow-Headers", "X-Custom-Timestrap");
     res.header("Access-Control-Allow-Origin", "http://localhost:8088");
     res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
     res.header("Access-Control-Allow-Credentials", "true");

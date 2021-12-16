@@ -44,7 +44,7 @@ router.post("/login", function (req: CustomRequest, res: Response) {
     req.session && (req.session.isLogged = true);
     res.status(200).send(formatResult("登录成功"));
   } else {
-    res.status(500).send(formatResult(null, "登录失败"));
+    res.status(500).send(formatResult(null, "用户名或者密码错误"));
   }
 });
 
