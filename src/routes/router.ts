@@ -2,9 +2,11 @@ import Vue from "vue";
 import { createRenderer } from "vue-server-renderer";
 import { Router, Request, Response } from "express";
 import { SciencesAnalyzer, EngineerAnalyzer } from "../utils/analyzer";
+import { checkUserName, registerUser } from '../service/user';
 import { checkLogin } from "../middleware/login";
-import Spider from "../utils/spider";
 import formatResult from "../utils/result";
+import Spider from "../utils/spider";
+
 const render = createRenderer({
   // 为整个页面的 HTML 提供一个模板。此模板应包含注释 <!--vue-ssr-outlet-->，作为渲染应用程序内容的占位符。
   template: `
@@ -53,6 +55,23 @@ router.get("/logout", function (req: Request, res: Response) {
     req.session.isLogged = false;
   }
   res.status(200).send(formatResult("退出成功"));
+});
+
+router.post("/register", async function (req: CustomRequest, res: Response) {
+  // 请求体中预期含有 username 和 password。
+  const username = req.body.username;
+  const password = req.body.password;
+  console.log('username: ', username, ' password: ', password);
+  const usernameExist = await checkUserName(username);
+  if (usernameExist) {
+    return res.status(500).send(formatResult("", "用户名被占用"));
+  }
+  const user = await registerUser(username, password);
+  if (user) {
+    res.status(200).send(formatResult("注册成功"));
+  } else {
+    res.status(500).send(formatResult(null, "注册失败"));
+  }
 });
 
 router.get(

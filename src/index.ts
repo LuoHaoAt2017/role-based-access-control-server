@@ -2,8 +2,10 @@ import express from "express";
 import bodyParser from "body-parser";
 import cookieSession from 'cookie-session';
 import router from './routes/router';
+import record from './middleware/record';
 
 const app = express();
+// 链接数据库
 // 虚拟路径前缀
 app.use('/static', express.static('./src/assets'));
 // 解析 form 参数
@@ -11,8 +13,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // 解析 json 参数
 app.use(bodyParser.json());
 // 自定义中间件 统计请求。
-// app.use(record);
-
+app.use(record);
 // 中间件
 app.use(cookieSession({
   name: 'js_session_id',
@@ -29,12 +30,9 @@ app.all('*', function(req, res, next) {
   res.header("Content-Type", "application/json;charset=utf-8");
   next();
 });
-
 // 注册路由
 app.use(router);
 // 指定端口
 app.listen(7001, function() {
   console.log('server listen on 7001');
 });
-
-export default app;
