@@ -9,9 +9,8 @@ export default function(sequelize: Sequelize) {
     // attributes
     id: {
       type: DataTypes.UUID,
-      allowNull: false,
       primaryKey: true,
-      unique: true,
+      allowNull: false,
       defaultValue: UUIDV4
     },
     username: {

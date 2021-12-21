@@ -1,11 +1,12 @@
 ###
-GET http://localhost:9090 HTTP/1.1
+POST http://localhost:7001/register
 content-type: application/json
 
-###
-GET http://localhost:9090/sciences-member
-content-type: application/json
+{
+  "username": "tomcat",
+  "password": "tomcat"
+}
 
 ###
-GET http://localhost:9090/engineer-member
+GET http://localhost:7001/users
 content-type: application/json

@@ -2,7 +2,7 @@ import Vue from "vue";
 import { createRenderer } from "vue-server-renderer";
 import { Router, Request, Response } from "express";
 import { SciencesAnalyzer, EngineerAnalyzer } from "../utils/analyzer";
-import { checkUserName, registerUser } from '../service/user';
+import { checkUserName, registerUser, getAllUsers } from '../service/user';
 import { checkLogin } from "../middleware/login";
 import formatResult from "../utils/result";
 import Spider from "../utils/spider";
@@ -61,18 +61,30 @@ router.post("/register", async function (req: CustomRequest, res: Response) {
   // 请求体中预期含有 username 和 password。
   const username = req.body.username;
   const password = req.body.password;
-  console.log('username: ', username, ' password: ', password);
+  // console.log('username: ', username, ' password: ', password);
   const usernameExist = await checkUserName(username);
   if (usernameExist) {
     return res.status(500).send(formatResult("", "用户名被占用"));
   }
-  const user = await registerUser(username, password);
-  if (user) {
-    res.status(200).send(formatResult("注册成功"));
+  const data = await registerUser(username, password);
+  if (data instanceof Error) {
+    res.status(500).send(formatResult(null, data));
   } else {
-    res.status(500).send(formatResult(null, "注册失败"));
+    res.status(200).send(formatResult(data));
   }
 });
+
+router.get(
+  "/users",
+  async function (req: Request, res: Response) {
+    const data = getAllUsers();
+    if (data instanceof Error) {
+      res.status(500).send(formatResult([], data.message));
+    } else {
+      res.status(200).send(formatResult(data));
+    }
+  }
+);
 
 router.get(
   "/sciences-member",
