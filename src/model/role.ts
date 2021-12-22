@@ -18,7 +18,11 @@ export default function(sequelize: Sequelize) {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    introduction: {
+    nick_name: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    description: {
       type: DataTypes.STRING,
       allowNull: false,
     }

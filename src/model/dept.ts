@@ -1,6 +1,15 @@
 import { Model, Sequelize, DataTypes, UUIDV4 } from "sequelize";
 // 组织部门 https://zh.wikipedia.org/zh-cn/%E5%94%90%E6%9C%9D#%E4%B8%89%E7%9C%81%E5%85%AD%E9%83%A8%E5%88%B6
 
+enum DeptType {
+  Official = 1,
+  Population = 2,
+  Etiquette = 3,
+  Defense = 4,
+  Criminal = 5,
+  Engineer = 6
+}
+
 export class Department extends Model {
 
 }
@@ -22,7 +31,13 @@ export default function(sequelize: Sequelize) {
     },
     dept_logo: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
+      defaultValue: ""
+    },
+    dept_type: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: 1
     },
     description: {
       type: DataTypes.STRING,
@@ -44,12 +59,12 @@ export default function(sequelize: Sequelize) {
 // }
 
 // // 户部
-// export class FinanceDepartment extends Department {
+// export class PopulationDepartment extends Department {
 
 // }
 
 // // 礼部
-// export class EtiquetteDepartment extends Department {
+// export class EducationDepartment extends Department {
 
 // }
 
@@ -64,6 +79,6 @@ export default function(sequelize: Sequelize) {
 // }
 
 // // 工部
-// export class TransportDepartment extends Department {
+// export class EngineerDepartment extends Department {
 
 // }

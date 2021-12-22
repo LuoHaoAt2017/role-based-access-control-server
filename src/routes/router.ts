@@ -2,7 +2,9 @@ import Vue from "vue";
 import { createRenderer } from "vue-server-renderer";
 import { Router, Request, Response } from "express";
 import { SciencesAnalyzer, EngineerAnalyzer } from "../utils/analyzer";
-import { checkUserName, registerUser, getAllUsers } from '../service/user';
+import DeptService from "../service/dept";
+import UserService from "../service/user";
+import RoleService from "../service/role";
 import { checkLogin } from "../middleware/login";
 import formatResult from "../utils/result";
 import Spider from "../utils/spider";
@@ -37,16 +39,25 @@ interface CustomRequest extends Request {
 
 const router = Router();
 
-router.post("/login", function (req: CustomRequest, res: Response) {
+router.post("/login", async function (req: CustomRequest, res: Response) {
   // 请求体中预期含有 username 和 password。
   const username = req.body.username;
   const password = req.body.password;
   // console.log('username: ', username, ' password: ', password);
-  if (username === "luohao" && password === "123") {
-    req.session && (req.session.isLogged = true);
-    res.status(200).send(formatResult("登录成功"));
+  const resp = await UserService.getUserByName(username);
+  if (resp instanceof Error) {
+    return res.status(500).send(formatResult(null, resp));
+  }
+  if (Array.isArray(resp) && resp.length > 0) {
+    const user = resp[0];
+    if (user.username === username && user.password === password) {
+      req.session && (req.session.isLogged = true);
+      res.status(200).send(formatResult(user));
+    } else {
+      res.status(500).send(formatResult(null, "用户名或者密码错误"));
+    }
   } else {
-    res.status(500).send(formatResult(null, "用户名或者密码错误"));
+    res.status(500).send(formatResult(null, "用户不存在"));
   }
 });
 
@@ -61,12 +72,14 @@ router.post("/register", async function (req: CustomRequest, res: Response) {
   // 请求体中预期含有 username 和 password。
   const username = req.body.username;
   const password = req.body.password;
-  // console.log('username: ', username, ' password: ', password);
-  const usernameExist = await checkUserName(username);
-  if (usernameExist) {
+  const resp = await UserService.getUserByName(username);
+  if (resp instanceof Error) {
+    return res.status(500).send(formatResult(null, resp));
+  }
+  if (Array.isArray(resp) && resp.length > 0) {
     return res.status(500).send(formatResult("", "用户名被占用"));
   }
-  const data = await registerUser(username, password);
+  const data = await UserService.registerUser(username, password);
   if (data instanceof Error) {
     res.status(500).send(formatResult(null, data));
   } else {
@@ -74,17 +87,98 @@ router.post("/register", async function (req: CustomRequest, res: Response) {
   }
 });
 
-router.get(
-  "/users",
-  async function (req: Request, res: Response) {
-    const data = getAllUsers();
+router.get("/GetAllUser", async function (req: Request, res: Response) {
+  const data = await UserService.getAllUsers();
+  if (data instanceof Error) {
+    res.status(500).send(formatResult([], data.message));
+  } else {
+    res.status(200).send(formatResult(data));
+  }
+});
+
+router.get("/GetAllUserWithRole", async function (req: Request, res: Response) {
+  const data = await UserService.getUserWithRole();
+  if (data instanceof Error) {
+    res.status(500).send(formatResult(null, data.message));
+  } else {
+    res.status(200).send(formatResult(data));
+  }
+});
+
+router.get("/GetUserById", async function (req: Request, res: Response) {
+  console.log("query: ", req.query, " param: ", req.params);
+  if (req.query && req.query.uid) {
+    const userId = req.query.uid as string;
+    const data = await UserService.getUserById(userId);
     if (data instanceof Error) {
-      res.status(500).send(formatResult([], data.message));
+      res.status(500).send(formatResult(null, data.message));
     } else {
       res.status(200).send(formatResult(data));
     }
   }
-);
+});
+
+router.get("/SetUserRoles", async function (req: Request, res: Response) {
+  if (!req.query.userId) {
+    return res.status(500).send(formatResult(null, "userId 缺失"));
+  }
+  if (!req.query.roles || req.query.roles.length === 0) {
+    return res.status(500).send(formatResult(null, "roles 不为空"));
+  }
+  const userId = req.query.userId as string;
+  const roles = req.query.roles as string[];
+  const data = await UserService.setUserRoles(userId, roles);
+  if (data instanceof Error) {
+    res.status(500).send(formatResult(null, data.message));
+  } else {
+    res.status(200).send(formatResult(data));
+  }
+});
+
+router.post("/CreateDepartment", async function (req: Request, res: Response) {
+  // console.log('username: ', username, ' password: ', password);
+  const data = await DeptService.create({
+    dept_name: req.body.dept_name,
+    dept_logo: req.body.dept_logo || "",
+    description: req.body.description,
+  });
+  if (data instanceof Error) {
+    res.status(500).send(formatResult(null, "新增失败"));
+  } else {
+    res.status(200).send(formatResult(data));
+  }
+});
+
+router.get("/SearchDepartment", async function (req: Request, res: Response) {
+  const data = await DeptService.search();
+  if (data instanceof Error) {
+    res.status(500).send(formatResult(null, "查询失败"));
+  } else {
+    res.status(200).send(formatResult(data));
+  }
+});
+
+router.post("/CreateRole", async function (req: Request, res: Response) {
+  const data = await RoleService.create({
+    role_name: req.body.role_name,
+    nick_name: req.body.nick_name,
+    description: req.body.description,
+  });
+  if (data instanceof Error) {
+    res.status(500).send(formatResult(null, "新增失败"));
+  } else {
+    res.status(200).send(formatResult(data));
+  }
+});
+
+router.get("/SearchRole", async function (req: Request, res: Response) {
+  const data = await RoleService.search();
+  if (data instanceof Error) {
+    res.status(500).send(formatResult(null, data));
+  } else {
+    res.status(200).send(formatResult(data));
+  }
+});
 
 router.get(
   "/sciences-member",

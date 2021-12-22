@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import cookieSession from 'cookie-session';
 import router from './routes/router';
 import record from './middleware/record';
+import { errorHandler } from './utils/error';
 import connect from './model/index';
 (async function server() {
   // 链接数据库
@@ -22,7 +23,6 @@ import connect from './model/index';
     keys: ['rbac'],
     // maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }));
-  
   //设置跨域访问
   app.all('*', function(req, res, next) {
     res.header("Access-Control-Allow-Headers", "Content-Type,X-Custom-Timestrap");
@@ -34,6 +34,8 @@ import connect from './model/index';
   });
   // 注册路由
   app.use(router);
+  // 错误处理
+  app.use(errorHandler)
   // 指定端口
   app.listen(7001, function() {
     console.log('server listen on 7001');

@@ -1,12 +1,91 @@
+
+// ========================== 用户 =============================
 ###
 POST http://localhost:7001/register
 content-type: application/json
 
 {
-  "username": "tomcat",
+  "username": "亚里士多德",
   "password": "tomcat"
 }
 
 ###
-GET http://localhost:7001/users
+GET http://localhost:7001/GetAllUser
 content-type: application/json
+
+// ========================== 部门 =============================
+
+###
+POST http://localhost:7001/CreateDepartment
+content-type: application/json
+
+{
+  "dept_name": "吏部",
+  "description": "掌管全国官吏的任免、考核、升降、调动等事务。"
+}
+
+###
+POST http://localhost:7001/CreateDepartment
+content-type: application/json
+
+{
+  "dept_name": "户部",
+  "description": "掌管天下土地、户籍、赋税、财政收支等。"
+}
+
+###
+POST http://localhost:7001/CreateDepartment
+content-type: application/json
+
+{
+  "dept_name": "礼部",
+  "description": "掌管国家典章法度、宫内红白事、祭祀学校、科举考试、接待外宾等事务。"
+}
+
+###
+POST http://localhost:7001/CreateDepartment
+content-type: application/json
+
+{
+  "dept_name": "兵部",
+  "description": "掌管武将选用、军队训练、兵籍、军械、军令等。"
+}
+
+###
+POST http://localhost:7001/CreateDepartment
+content-type: application/json
+
+{
+  "dept_name": "刑部",
+  "description": "掌管法律、刑狱事务等。"
+}
+
+###
+POST http://localhost:7001/CreateDepartment
+content-type: application/json
+
+{
+  "dept_name": "工部",
+  "description": "掌管山泽、屯田、工匠、水利、交通、各项工程以及贵族的生活用品等。"
+}
+
+###
+GET http://localhost:7001/SearchDepartment
+content-type: application/json
+
+// ========================== 角色 =============================
+
+
+###
+GET http://localhost:7001/SearchRole
+content-type: application/json
+
+###
+POST http://localhost:7001/CreateRole
+content-type: application/json
+
+{
+  "role_name": "EngineerMinister",
+  "nick_name": "工部尚书",
+  "description": ""
+}

@@ -1,43 +1,92 @@
-import { User } from '../model/user';
-/**
- * 检查用户名是否存在重复
- */
-export async function checkUserName(username: string): Promise<boolean> {
-  try {
-    const data = await User.findAll({
-      where: {
-        username: username
-      }
-    });
-    return data.length > 0;
-   } catch(err) {
-     return false;
-   }
-}
+import { User } from "../model/user";
+import { Role } from "../model/role";
+import { Op } from "sequelize";
 
-/**
- * 注册
- */
-export async function registerUser(username: string, password: string): Promise<any | Error> {
+async function registerUser(
+  username: string,
+  password: string
+): Promise<any | Error> {
   try {
-    console.log('username: ', username, ' password: ', password);
     const data = await User.create({
       username: username,
-      password: password
+      password: password,
     });
     return data;
-   } catch(err) {
+  } catch (err) {
     return err;
-   }
+  }
 }
 
-/**
- * 注册
- */
- export async function getAllUsers() {
-   try {
+async function getAllUsers() {
+  try {
     return await User.findAll();
-   } catch(err) {
+  } catch (err) {
     return err;
-   }
+  }
 }
+
+async function getUserWithRole(): Promise<any | Error> {
+  try {
+    return await User.findAll({
+      include: [
+        {
+          model: Role,
+          as: "roles",
+        },
+      ],
+    });
+  } catch (err) {
+    return err;
+  }
+}
+
+async function setUserRoles(userId: string, roleIds: string[]): Promise<any | Error> {
+  try {
+    const user = await User.findByPk(userId);
+    if (!user) {
+      return new Error("用户不存在");
+    }
+    const roles = await Role.findAll({
+      where: {
+        id: {
+          [Op.in]: roleIds
+        }
+      }
+    });
+    if (!roles || roles.length == 0) {
+      return new Error("角色不存在");
+    }
+    return await (user as any).setRoles(roles);
+  } catch (err) {
+    return err;
+  }
+}
+
+async function getUserByName(name: string): Promise<any | Error> {
+  try {
+    return await User.findAll({
+      where: {
+        username: name,
+      },
+    });
+  } catch (err) {
+    return err;
+  }
+}
+
+async function getUserById(id: string): Promise<any | Error> {
+  try {
+    return await User.findByPk(id);
+  } catch (err) {
+    return err;
+  }
+}
+
+export default {
+  getUserByName,
+  registerUser,
+  getAllUsers,
+  getUserById,
+  getUserWithRole,
+  setUserRoles
+};
